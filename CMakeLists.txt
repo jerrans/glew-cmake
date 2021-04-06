@@ -121,6 +121,7 @@ set(GLEW_TARGETS)
 
 if(NOT CMAKE_INSTALL_LIBDIR)
 	set(INSTALL_LIBDIR lib)
+	set(INSTALL_BINDIR bin)
 else()
 	set(INSTALL_LIBDIR ${CMAKE_INSTALL_LIBDIR})
 endif()
@@ -175,7 +176,7 @@ if(glew-cmake_BUILD_SHARED)
 
 	if(glew-cmake_BUILD_STATIC)
 		set_target_properties(libglew_shared PROPERTIES
-			OUTPUT_NAME "glew-shared"
+			OUTPUT_NAME "glew"
 			DEBUG_POSTFIX d)
 	else()
 		set_representative_target(libglew_shared)
@@ -200,6 +201,7 @@ if(PKG_CONFIG_REPRESENTATIVE_TARGET)
 endif()
 
 install(TARGETS ${GLEW_TARGETS} EXPORT glew-cmake
+	   RUNTIME DESTINATION ${INSTALL_BINDIR}
        ARCHIVE DESTINATION ${INSTALL_LIBDIR}
        LIBRARY DESTINATION ${INSTALL_LIBDIR})
 install(EXPORT glew-cmake DESTINATION ${INSTALL_LIBDIR}/cmake/glew FILE glewConfig.cmake)
