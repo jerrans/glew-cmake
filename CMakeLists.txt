@@ -126,10 +126,12 @@ else()
 	set(INSTALL_LIBDIR ${CMAKE_INSTALL_LIBDIR})
 endif()
 
+set(DEBUG_POSTFIX d)
+
 function(set_representative_target TARGET)
 	set_target_properties(${TARGET} PROPERTIES
 			OUTPUT_NAME "glew"
-			DEBUG_POSTFIX d)
+			DEBUG_POSTFIX ${DEBUG_POSTFIX})
 
 	# Windows & macOS use case-insensetive FS. do not create symbolic link
 	if(NOT (WIN32 OR APPLE))
@@ -143,21 +145,13 @@ function(set_representative_target TARGET)
 		endif()
 		if(NOT ${CMAKE_VERSION} VERSION_LESS 3.0)
 			add_custom_command(TARGET ${TARGET} POST_BUILD
-					COMMAND ${CMAKE_COMMAND} ARGS -E create_symlink libglew${EXT} libGLEW${EXT}
+					COMMAND ${CMAKE_COMMAND} ARGS -E create_symlink libglew$<$<CONFIG:Debug>:${DEBUG_POSTFIX}>${EXT} libGLEW$<$<CONFIG:Debug>:${DEBUG_POSTFIX}>${EXT}
 					WORKING_DIRECTORY ${OUT_DIR}
-					BYPRODUCTS ${OUT_DIR}/libGLEW${EXT}
 					COMMENT "create libGLEW symbolic link")
-		else()
-			add_custom_command(TARGET ${TARGET} POST_BUILD
-					COMMAND bash ARGS -c "( test ! -e ${OUT_DIR}/libGLEW${EXT} && cd ${OUT_DIR} && ${CMAKE_COMMAND} -E create_symlink libglew${EXT} libGLEW${EXT} ) || true"
-					COMMENT "create libGLEW symbolic link"
-					VERBATIM)
 		endif()
 
 		if(NOT ${CMAKE_VERSION} VERSION_LESS 3.14)
-			install(FILES ${OUT_DIR}/libGLEW${EXT} TYPE LIB)
-		else()
-			install(FILES ${OUT_DIR}/libGLEW${EXT} DESTINATION ${INSTALL_LIBDIR})
+			install(FILES ${OUT_DIR}/libGLEW$<$<CONFIG:Debug>:${DEBUG_POSTFIX}>${EXT} TYPE LIB)
 		endif()
 	endif()
 endfunction()
@@ -177,7 +171,7 @@ if(glew-cmake_BUILD_SHARED)
 	if(glew-cmake_BUILD_STATIC)
 		set_target_properties(libglew_shared PROPERTIES
 			OUTPUT_NAME "glew"
-			DEBUG_POSTFIX d)
+			DEBUG_POSTFIX ${DEBUG_POSTFIX})
 	else()
 		set_representative_target(libglew_shared)
 	endif()
